@@ -4,13 +4,14 @@ Developed by Santiago Tarrio
 ZDT3 function in Python for the multiobjective evolutionary algorithm.
 """
 import math
+import numpy as np
 
 class ZDT3():
     def __init__(self,n=30):
         self.n_real = n
         self.n_obj = 2
-        self.min_real = [0.0 for _ in range(n)]
-        self.max_real = [1.0 for _ in range(n)]
+        self.min_real = np.array([0.0 for _ in range(n)])
+        self.max_real = np.array([1.0 for _ in range(n)])
 
     def func(self,xreal):
         obj_0 = xreal[0]
