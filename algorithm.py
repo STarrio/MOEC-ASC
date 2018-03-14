@@ -6,10 +6,18 @@ import zdt3
 import random
 import numpy as np
 
-def euclidean(v1,v2):
-    return np.linalg.norm(v1-v2)
 
 class MOEC:
-    def __init__(self,problem=zdt3.ZDT3(),generations,neighbourhood=0.2):
-        self.n_sp = problem.n_obj
-        self.lambda_vectors=[np.random.dirichlet(np.ones(self.n_sp),size=1) for _ in self.n_sp]
+    def __init__(self,n_sp,generations,neighbourhood,problem=zdt3.ZDT3()):
+        self.n_sp = n_sp
+        self.problem = problem
+        #revisar
+        self.lambda_vectors=[np.random.dirichlet(np.ones(self.problem.n_obj),size=1) for _ in range(self.n_sp)]
+        self.neighbours = {}
+        for i in range(self.n_sp):
+            self.neighbours[i] = self.get_neighbours(self.lambda_vectors[i],[n for n in range(self.n_sp) if n!=i],self.lambda_vectors,neighbourhood)
+
+
+    def get_neigbours(self,v1,sps,lambdas,T):
+        return sorted(lambdas, key = lambda v: np.linalg.norm(v1-lambdas[v]))[:T]
+

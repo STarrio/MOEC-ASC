@@ -6,7 +6,7 @@ ZDT3 function in Python for the multiobjective evolutionary algorithm.
 import math
 import numpy as np
 
-class ZDT3():
+class ZDT3:
     def __init__(self,n=30):
         self.n_real = n
         self.n_obj = 2
