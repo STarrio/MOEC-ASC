@@ -16,6 +16,7 @@ class MOEC:
 
         #revisar
         self.lambda_vectors=[np.random.dirichlet(np.ones(self.problem.n_obj),size=1)[0] for _ in range(self.n_sp)]
+
         self.neighbours = {}
         for i in range(self.n_sp):
             self.neighbours[i] = self.get_neighbours(self.lambda_vectors[i],[n for n in range(self.n_sp) if n!=i],self.lambda_vectors,neighbourhood)
@@ -43,10 +44,24 @@ class MOEC:
         return self.population
     
     def recombination(self,i):
+        #revisar
+        # todo el vecindario de x_j puede salir, incluyendo x_j, que PUEDE SALIR, pero no tiene por que
+        # tambien vale mi version, PROBAR
         differential_sp = np.random.choice(self.neighbours[i],size=2,replace=False)
         vectors = [self.population[v] for v in differential_sp]
-        de_result = self.population[i]+self.de_F*(vectors[0]-vectors[1])
-        
+
+        #revisar
+        if(random.random()>=self.CR):
+            de_result = self.population[i]+self.de_F*(vectors[0]-vectors[1])
+        else:
+            de_result = self.population[i]
+
+        #falta cruce
+        # genero un nuevo vector donde, con una cierta probabilidad CR, se copia cada posicion del vector de 
+        # population[i] o de de_result
+
+        #falta mutacion gaussiana, que con probabilidad 1/p significa que estadisticamente solo cambiara UNO de los elementos
+         
         return de_result
     
     def tchebycheff(self,x,lamb):
