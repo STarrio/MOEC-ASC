@@ -1,4 +1,6 @@
 """
+Developed by Santiago Tarrio
+
 Algorithm module
 """
 
@@ -6,8 +8,10 @@ import zdt3
 import random
 import numpy as np
 
-
 class MOEC:
+    # Evaluaciones: N x G <= 4000 ó 10000
+    # N: n_sp
+    # G: generations
     def __init__(self,n_sp,generations,neighbourhood,de_F,problem=zdt3.ZDT3()):
         self.n_sp = n_sp
         self.problem = problem
@@ -15,6 +19,11 @@ class MOEC:
         self.de_F = de_F
 
         #revisar
+        #para N sp
+        #l_1    l_2 nº objetivos
+        #N/N-1  1-N/N-1
+        #...    ...
+        # siempre 2d
         self.lambda_vectors=[np.random.dirichlet(np.ones(self.problem.n_obj),size=1)[0] for _ in range(self.n_sp)]
 
         self.neighbours = {}
@@ -25,8 +34,8 @@ class MOEC:
         performances = [self.problem.func(s) for s in self.population]
         self.z_star = np.array([min([ind[o] for ind in self.population]) for o in range(self.problem.n_obj)])
 
-
     def get_neighbours(self,v1,sps,lambdas,T):
+        #incluye a si mismo
         return sorted(sps, key = lambda v: np.linalg.norm(v1-lambdas[v]))[:T]
 
     def run(self):
@@ -34,7 +43,10 @@ class MOEC:
             for i in range(self.n_sp):
                 y = self.recombination(i)
                 y_performance = self.problem.func(y)
+
+                # si mejora al antiguo, sustituye, si no, nos quedamos el antiguo
                 self.population[i] = y
+
                 for j in range(self.problem.n_obj):
                     if(y_performance[j]<=self.z_star[j]):
                         self.z_star[j]=y_performance[j]
@@ -47,7 +59,8 @@ class MOEC:
         #revisar
         # todo el vecindario de x_j puede salir, incluyendo x_j, que PUEDE SALIR, pero no tiene por que
         # tambien vale mi version, PROBAR
-        differential_sp = np.random.choice(self.neighbours[i],size=2,replace=False)
+        # CON REEMPLAZAMIENTO
+        differential_sp = np.random.choice(self.neighbours[i],size=2)
         vectors = [self.population[v] for v in differential_sp]
 
         #revisar
