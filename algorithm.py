@@ -47,25 +47,22 @@ class MOEC:
         return self.population
     
     def recombination(self,i):
-        #revisar
         # todo el vecindario de x_j puede salir, incluyendo x_j, que PUEDE SALIR, pero no tiene por que
         # tambien vale mi version, PROBAR
         # CON REEMPLAZAMIENTO
         differential_sp = np.random.choice(self.neighbours[i],size=3)
         vectors = [self.population[v] for v in differential_sp]
 
-        #revisar
         de_result = vectors[0]+self.de_F*(vectors[1]-vectors[2])
 
-        #falta cruce
         # genero un nuevo vector donde, con una cierta probabilidad CR, se copia cada posicion del vector de 
         # population[i] o de de_result
         
         de_result = [de_result[p] if random.random()>= self.CR else self.population[i][p] for p in range(len(de_result))]
 
-        #falta mutacion gaussiana, que con probabilidad 1/p significa que estadisticamente solo cambiara UNO de los elementos
+        #con probabilidad 1/p significa que estadisticamente solo cambiara UNO de los elementos
         sigma = lambda p: (self.problem.max_real[p]-self.problem.min_real[p])/self.SIG
-        de_result = [de_result[p] + np.random.normal(0,sigma(p)) if random.random()>= self.problem.n_real else de_result[p]
+        de_result = [de_result[p] + np.random.normal(0,sigma(p)) if random.random()>= 1/self.problem.n_real else de_result[p]
                         for p in range(len(de_result))]
                             
         return de_result
