@@ -28,7 +28,7 @@ class MOEC:
 
         self.population = [np.random.uniform(self.problem.min_real,self.problem.max_real) for _ in range(self.n_sp)]
         performances = [self.problem.func(s) for s in self.population]
-        self.z_star = np.array([min([ind[o] for ind in self.population]) for o in range(self.problem.n_obj)])
+        self.z_star = np.array([min([ind[o] for ind in performances]) for o in range(self.problem.n_obj)])
 
     def get_neighbours(self,v1,sps,lambdas,T):
         return sorted(sps, key = lambda v: np.linalg.norm(v1-lambdas[v]))[:T]
