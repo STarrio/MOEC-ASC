@@ -10,6 +10,7 @@ class ZDT3:
     def __init__(self,n=30):
         self.n_real = n
         self.n_obj = 2
+        self.n_con = 0
         self.min_real = np.array([0.0 for _ in range(n)])
         self.max_real = np.array([1.0 for _ in range(n)])
 
@@ -19,3 +20,6 @@ class ZDT3:
         h = 1 - math.sqrt(obj_0/g)-(obj_0/g)*math.sin(10*math.pi*obj_0)
         obj_1 = g*h
         return (obj_0,obj_1)
+
+    def const(self,xreal):
+        return (0.,0.)
