@@ -16,3 +16,9 @@ def read_plotout(path):
     nsga_x = np.array([p[0] for p in p_parsed])
     nsga_y = np.array([p[1] for p in p_parsed])
     return (nsga_x,nsga_y)
+
+def plot_out(results,problem,test_n):
+    p = open("MOEC_outs/plot_{0}_{1}.out".format(problem.stringify(),test_n),"w+")
+    for l in results:
+        p.write("{0} {1}\n".format(l[0],l[1]))
+    p.close()

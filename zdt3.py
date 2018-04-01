@@ -23,3 +23,6 @@ class ZDT3:
 
     def const(self,xreal):
         return (0.,0.)
+
+    def stringify(self):
+        return "ZDT3"
