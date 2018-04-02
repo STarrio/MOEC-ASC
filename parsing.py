@@ -25,7 +25,7 @@ def plot_out(results,problem,test_n):
 
 class Parser:
     def __init__(self,path):
-        self.path = "METRICS/"+path
+        self.path = "MOEC_outs/"+path
         open(self.path,"w+")
     def write_popm(self,pop,problem):
         with open(self.path,"a+") as popm:

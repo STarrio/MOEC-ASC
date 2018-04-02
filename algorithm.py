@@ -13,7 +13,7 @@ class MOEC:
     # Evaluaciones: N x G <= 4000 ó 10000
     # N: n_sp
     # G: generations
-    def __init__(self,n_sp,generations,neighbourhood,de_F,de_CR,de_SIG,path_to_file,crossover_mode,const_mode=None,problem=zdt3.ZDT3(),weights=False):
+    def __init__(self,n_sp,generations,neighbourhood,de_F,de_CR,de_SIG,crossover_mode,path_to_file,const_mode=None,problem=zdt3.ZDT3(),weights=False):
         self.n_sp = n_sp
         self.problem = problem
         self.generations = generations
@@ -93,7 +93,7 @@ class MOEC:
                         de_result[i]=vectors[1][i]
             else:
                 de_result = vectors[0]
-        else:
+        elif(self.crossover == "DE"):
             de_result = vectors[0]+self.de_F*(vectors[1]-vectors[2])
 
             # genero un nuevo vector donde, con una cierta probabilidad CR, se copia cada posicion del vector de
@@ -105,6 +105,9 @@ class MOEC:
             sigma = lambda p: (self.problem.max_real[p]-self.problem.min_real[p])/self.de_SIG
             de_result = np.array([de_result[p] + np.random.normal(0,sigma(p)) if random.random()>= 1/self.problem.n_real else de_result[p]
                             for p in range(len(de_result))])
+        else:
+            de_result = self.population[i]
+
         for e in range(len(de_result)):
             if(de_result[e] > self.problem.max_real[e]):
                 de_result[e]=self.problem.max_real[e]

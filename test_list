@@ -1,16 +1,16 @@
-4000 budget:
--p40 g100
--p60 g66
--p80 g50
--p100 g40
--p160 g25
+4000 budget:  ZDT3   CF6
+-p40 g100      x      x
+-p60 g66       x      x
+-p80 g50       x      x
+-p100 g40      x      x
+-p160 g25      x      x
 
 10000 budget:
--p100 g100
--p60 g166
--p160 g62
--p200 g50
--p400 g25
+-p100 g100     x      x
+-p60 g166      x      x
+-p160 g62      x      x
+-p200 g50      x      x
+-p400 g25      x      x
 
 
 
