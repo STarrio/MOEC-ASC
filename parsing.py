@@ -22,3 +22,15 @@ def plot_out(results,problem,test_n):
     for l in results:
         p.write("{0} {1}\n".format(l[0],l[1]))
     p.close()
+
+class Parser:
+    def __init__(self,path):
+        self.path = "METRICS/"+path
+        open(self.path,"w+")
+    def write_popm(self,pop,problem):
+        with open(self.path,"a+") as popm:
+            for p in pop:
+                res = problem.func(p)
+                const = sum(problem.const(p))
+                popm.write("{0} {1} {2}\n".format(res[0],res[1],const))
+

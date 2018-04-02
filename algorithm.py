@@ -7,12 +7,13 @@ Algorithm module
 import zdt3
 import random
 import numpy as np
+import parsing
 
 class MOEC:
     # Evaluaciones: N x G <= 4000 ó 10000
     # N: n_sp
     # G: generations
-    def __init__(self,n_sp,generations,neighbourhood,de_F,de_CR,de_SIG,const_mode=None,problem=zdt3.ZDT3(),weights=False):
+    def __init__(self,n_sp,generations,neighbourhood,de_F,de_CR,de_SIG,path_to_file,const_mode=None,problem=zdt3.ZDT3(),weights=False):
         self.n_sp = n_sp
         self.problem = problem
         self.generations = generations
@@ -34,6 +35,8 @@ class MOEC:
         performances = [self.problem.func(s) for s in self.population]
         self.z_star = np.array([min([ind[o] for ind in performances]) for o in range(self.problem.n_obj)])
         self.initialize_EP(performances)
+        self.parser = parsing.Parser(path_to_file)
+
 
     def get_neighbours(self,v1,sps,lambdas,T):
         return sorted(sps, key = lambda v: np.linalg.norm(v1-lambdas[v]))[:T]
@@ -52,6 +55,8 @@ class MOEC:
                 for j in self.neighbours[i]:
                     if(self.fitness(y,self.population[j],self.lambda_vectors[j])):
                         self.population[j]=y
+            self.parser.write_popm(self.population,self.problem)
+        print("Finished")
         return self.population
 
     def recombination(self,i):

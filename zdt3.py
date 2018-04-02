@@ -22,7 +22,7 @@ class ZDT3:
         return (obj_0,obj_1)
 
     def const(self,xreal):
-        return (0.,0.)
+        return np.array([0.,0.])
 
     def stringify(self):
         return "ZDT3"
