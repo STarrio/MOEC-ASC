@@ -13,7 +13,7 @@ class MOEC:
     # Evaluaciones: N x G <= 4000 ó 10000
     # N: n_sp
     # G: generations
-    def __init__(self,n_sp,generations,neighbourhood,de_F,de_CR,de_SIG,path_to_file,const_mode=None,problem=zdt3.ZDT3(),weights=False):
+    def __init__(self,n_sp,generations,neighbourhood,de_F,de_CR,de_SIG,path_to_file,crossover_mode,const_mode=None,problem=zdt3.ZDT3(),weights=False):
         self.n_sp = n_sp
         self.problem = problem
         self.generations = generations
@@ -21,6 +21,7 @@ class MOEC:
         self.de_CR = de_CR
         self.de_SIG = de_SIG
         self.const = const_mode
+        self.crossover = crossover_mode
         self.weights = weights if weights else np.array([1 for _ in range(problem.n_con)])
 
         self.EP = list()
@@ -44,7 +45,7 @@ class MOEC:
     def run(self):
         for g in range(self.generations):
             for i in range(self.n_sp):
-                y = self.recombination(i)
+                y = self.recombination(i,g)
                 y_performance = self.problem.func(y)
                 self.update_EP(y,y_performance)
 
@@ -59,25 +60,51 @@ class MOEC:
         print("Finished")
         return self.population
 
-    def recombination(self,i):
+    def recombination(self,i,gen=None):
         # todo el vecindario de x_j puede salir, incluyendo x_j, que PUEDE SALIR, pero no tiene por que
         # tambien vale mi version, PROBAR
         # CON REEMPLAZAMIENTO
         # incluye a las soluciones de EP
-        differential_sp = np.random.choice(self.neighbours[i]+list(range(len(self.EP))),size=3,replace=False)
+        differential_sp = np.random.choice(self.neighbours[i]+list(range(len(self.EP))),size=3)
         vector_pool = self.population + [f[0] for f in self.EP]
         vectors = [vector_pool[v] for v in differential_sp]
-        de_result = vectors[0]+self.de_F*(vectors[1]-vectors[2])
 
-        # genero un nuevo vector donde, con una cierta probabilidad CR, se copia cada posicion del vector de
-        # population[i] o de de_result
+        if(self.crossover == "AHX"):
+            p1 = 0.7*(1/(1+np.exp(20*((gen/self.generations)-0.25))))+0.3
+            p2 = 0.8*(1/(1+np.exp(-20*((gen/self.generations)-0.5))))+0.1
 
-        de_result = np.array([de_result[p] if random.random()>= self.de_CR else self.population[i][p] for p in range(len(de_result))])
+            if(random.random()<self.de_CR):
+                de_result=np.zeros(self.problem.n_real)
+                for i in range(self.problem.n_real):
+                    if(random.random()<p1):
+                        b_rand = random.random()
+                        beta = (2*b_rand)**(1/(1+self.de_SIG)) if b_rand <= 0.5 else (1/(2-2*b_rand))**(1/(1+self.de_SIG))
+                        c1 = 0.5*((1+beta)*vectors[0][i]+(1-beta)*vectors[1][i])
+                        c2 = 0.5*((1-beta)*vectors[0][i]+(1+beta)*vectors[1][i])
+                        v_i = vectors[0][i]+self.de_F*(vectors[1][i]-vectors[2][i])
+                        if(random.random()<p2):
+                            if(random.random()<0.5):
+                                de_result[i]=c2
+                            else:
+                                de_result[i]=c1
+                        else:
+                            de_result[i]=v_i
+                    else:
+                        de_result[i]=vectors[1][i]
+            else:
+                de_result = vectors[0]
+        else:
+            de_result = vectors[0]+self.de_F*(vectors[1]-vectors[2])
 
-        #con probabilidad 1/p significa que estadisticamente solo cambiara UNO de los elementos
-        sigma = lambda p: (self.problem.max_real[p]-self.problem.min_real[p])/self.de_SIG
-        de_result = np.array([de_result[p] + np.random.normal(0,sigma(p)) if random.random()>= 1/self.problem.n_real else de_result[p]
-                        for p in range(len(de_result))])
+            # genero un nuevo vector donde, con una cierta probabilidad CR, se copia cada posicion del vector de
+            # population[i] o de de_result
+
+            de_result = np.array([de_result[p] if random.random()>= self.de_CR else self.population[i][p] for p in range(len(de_result))])
+
+            #con probabilidad 1/p significa que estadisticamente solo cambiara UNO de los elementos
+            sigma = lambda p: (self.problem.max_real[p]-self.problem.min_real[p])/self.de_SIG
+            de_result = np.array([de_result[p] + np.random.normal(0,sigma(p)) if random.random()>= 1/self.problem.n_real else de_result[p]
+                            for p in range(len(de_result))])
         for e in range(len(de_result)):
             if(de_result[e] > self.problem.max_real[e]):
                 de_result[e]=self.problem.max_real[e]
